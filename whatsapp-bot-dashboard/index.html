@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Group Bot Dashboard · Demo</title>
+<meta name="description" content="Dashboard for a WhatsApp group bot: reply rules, per-group switch, live activity feed. Demo with simulated events.">
+<style>
+  :root {
+    --bg: #f4f6f5; --card: #fff; --ink: #17201c; --soft: #5d6b64; --line: #e1e7e4;
+    --green: #128c4a; --green-soft: #e3f4ea; --red: #c0392b; --red-soft: #fbe9e7; --amber: #9a6b00; --amber-soft: #fff4d6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .flag { background: var(--ink); color: #dfe9e4; text-align: center; font-size: 13px; padding: 6px; }
+  header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 20px; background: var(--card); border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 19px; margin: 0; flex: 1; min-width: 180px; }
+  .pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 99px; font-size: 13px; font-weight: 600; }
+  .pill i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .pill.ok { background: var(--green-soft); color: var(--green); }
+  .pill.bad { background: var(--red-soft); color: var(--red); }
+  button { font: inherit; cursor: pointer; }
+  .btn { border: 1px solid var(--line); background: var(--card); border-radius: 9px; padding: 7px 12px; font-weight: 600; font-size: 14px; color: var(--ink); }
+  .btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+  .alert { display: none; margin: 14px 20px 0; padding: 12px 14px; border-radius: 10px; background: var(--red-soft); color: var(--red); font-weight: 600; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .alert.on { display: flex; }
+  main { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; padding: 16px 20px 32px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .stats { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 600px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .stat b { display: block; font-size: 24px; }
+  .stat span { color: var(--soft); font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+  .card h2 { font-size: 15px; margin: 0 0 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td, th { text-align: left; padding: 8px 6px; border-top: 1px solid var(--line); }
+  th { color: var(--soft); font-weight: 600; font-size: 12px; border-top: 0; }
+  .muted { color: var(--soft); font-size: 13px; }
+  .switch { position: relative; width: 38px; height: 22px; border-radius: 99px; background: #c9d3ce; border: 0; padding: 0; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .15s; }
+  .switch.on { background: var(--green); }
+  .switch.on::after { left: 19px; }
+  .rule { border-top: 1px solid var(--line); padding: 9px 0; display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; }
+  .rule:first-of-type { border-top: 0; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 7px; border-radius: 6px; background: #eef1f0; color: var(--soft); margin-right: 6px; }
+  .reply { color: var(--soft); font-size: 13px; grid-column: 1 / -1; }
+  form.add { display: grid; grid-template-columns: 110px 1fr; gap: 8px; margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 10px; }
+  form.add select, form.add input, .tester input, .search { font: inherit; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; width: 100%; background: #fff; color: var(--ink); }
+  form.add .full { grid-column: 1 / -1; }
+  .tester { display: grid; grid-template-columns: 1fr 160px auto; gap: 8px; }
+  @media (max-width: 600px) { .tester { grid-template-columns: 1fr; } }
+  .verdict { margin-top: 10px; padding: 10px; border-radius: 8px; background: #f2f5f4; font-size: 14px; min-height: 40px; }
+  .feed { max-height: 640px; overflow: auto; }
+  .ev { border-top: 1px solid var(--line); padding: 9px 2px; }
+  .ev:first-child { border-top: 0; }
+  .ev .top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--soft); }
+  .ev .msg { margin: 3px 0; }
+  .ev .bot { font-size: 13px; padding: 6px 9px; border-radius: 8px; background: var(--green-soft); color: #0d5c31; }
+  .ev .skip { font-size: 12px; color: var(--soft); }
+  .ev .warn { font-size: 13px; padding: 6px 9px; border-radius: 8px; background: var(--amber-soft); color: var(--amber); }
+</style>
+</head>
+<body>
+<div class="flag">Demo · simulated messages and sample groups, not connected to a real WhatsApp number</div>
+<header>
+  <h1>Group Bot Dashboard</h1>
+  <span class="pill ok" id="status"><i></i><span>Connected</span></span>
+  <span class="muted" id="number">+00 000 000 000 (demo)</span>
+  <button class="btn" id="disconnect">Simulate disconnect</button>
+</header>
+<div class="alert" id="alert">
+  <span id="alert-text">Bot disconnected. Replies are paused and incoming messages are queued.</span>
+  <button class="btn" id="reconnect">Reconnect</button>
+</div>
+
+<main>
+  <section class="stats">
+    <div class="stat"><b id="s-msgs">0</b><span>Messages today</span></div>
+    <div class="stat"><b id="s-replies">0</b><span>Auto-replies sent</span></div>
+    <div class="stat"><b id="s-groups">0</b><span>Groups with bot on</span></div>
+    <div class="stat"><b id="s-latency">0 ms</b><span>Average reply time</span></div>
+  </section>
+
+  <div>
+    <div class="card">
+      <h2>Groups <span class="muted">turn the bot on or off per group</span></h2>
+      <table>
+        <thead><tr><th>Group</th><th>Members</th><th>Rules</th><th>Last message</th><th>Bot</th></tr></thead>
+        <tbody id="groups"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Reply rules <span class="muted">checked top to bottom, first match replies</span></h2>
+      <div id="rules"></div>
+      <form class="add" id="add-rule">
+        <select id="r-type">
+          <option value="keyword">Keyword</option>
+          <option value="exact">Exact phrase</option>
+          <option value="hours">Outside hours</option>
+        </select>
+        <input id="r-trigger" placeholder="price, how much (keywords, comma separated)" required>
+        <input id="r-reply" class="full" placeholder="Reply text" required>
+        <select id="r-group" class="full"></select>
+        <button class="btn primary full" type="submit">Add rule</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Test a message <span class="muted">see what the bot would do</span></h2>
+      <div class="tester">
+        <input id="t-text" placeholder="Type a message, e.g. how much is the cake?">
+        <select id="t-group"></select>
+        <button class="btn primary" id="t-run">Check</button>
+      </div>
+      <div class="verdict" id="t-out">Type a message and press Check.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Live activity <span class="muted" id="feed-note">updates in real time</span></h2>
+    <input class="search" id="search" placeholder="Search the log (group, sender, text)">
+    <div class="feed" id="feed" style="margin-top:8px"></div>
+  </div>
+</main>
+
+<script src="rules.js"></script>
+<script>
+(function () {
+  var groups = [
+    { id: "bakery",   name: "Bakery Orders",            members: 214, enabled: true,  last: null },
+    { id: "support",  name: "Tech Support Clients",     members: 88,  enabled: true,  last: null },
+    { id: "football", name: "Weekend Football",         members: 37,  enabled: true,  last: null },
+    { id: "residents",name: "Sunrise Apartments",       members: 156, enabled: false, last: null },
+    { id: "parents",  name: "Parents, Class 5B",        members: 29,  enabled: true,  last: null }
+  ];
+  var rules = [
+    { id: 1, name: "Prices",        type: "keyword", trigger: "price, prices, how much, cost", reply: "Our price list: example.com/prices. Reply ORDER to place an order.", groups: ["bakery"], enabled: true },
+    { id: 2, name: "Opening hours", type: "keyword", trigger: "open, opening hours, what time", reply: "We're open 8:00 to 20:00, Monday to Saturday.", groups: ["bakery"], enabled: true },
+    { id: 3, name: "Next game",     type: "keyword", trigger: "game, pitch", reply: "Next game: Saturday 10:00, pitch 2. Reply IN to join.", groups: ["football"], enabled: true },
+    { id: 4, name: "Group rules",   type: "exact",   trigger: "rules", reply: "Group rules: no ads, no spam, be kind. Admins: Anna and Mark.", groups: "all", enabled: true },
+    { id: 5, name: "After hours",   type: "hours",   trigger: "09:00-18:00", reply: "Thanks! The team answers 9:00 to 18:00, we'll get back to you in the morning.", groups: ["support"], enabled: true }
+  ];
+  var samples = {
+    bakery:    [["Maria", "How much is the sourdough loaf?"], ["Tom", "Are you open on Sunday?"], ["Leila", "Can I order 2 cakes for Friday?"], ["Ben", "price for croissants pls"], ["Sara", "Thank you, the cake was lovely!"]],
+    support:   [["Daniel", "My login stopped working"], ["Olga", "Invoice for September please"], ["Chris", "rules"], ["Priya", "The app is slow again today"]],
+    football:  [["Mark", "Is the game still on Saturday?"], ["Jamie", "I'm in"], ["Alex", "who has the pitch booking?"], ["Sam", "Great match last week lads"]],
+    residents: [["Anna", "Water is off on floor 3"], ["Ivan", "Who parked in my spot?"]],
+    parents:   [["Nadia", "rules"], ["Paul", "Is there homework for Monday?"], ["Kate", "Photos from the trip are great"]]
+  };
+  var stats = { msgs: 0, replies: 0, latencySum: 0 }, connected = true, queue = 0, log = [];
+  function $(s) { return document.querySelector(s); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function time(d) { return d.toTimeString().slice(0, 5); }
+  function groupName(id) { return groups.filter(function (g) { return g.id === id; })[0].name; }
+
+  function renderGroups() {
+    var tb = $("#groups"); tb.innerHTML = "";
+    groups.forEach(function (g) {
+      var tr = el("tr");
+      var count = rules.filter(function (r) { return r.groups === "all" || r.groups.indexOf(g.id) !== -1; }).length;
+      [g.name, g.members, count, g.last ? time(g.last) : "-"].forEach(function (v) { tr.appendChild(el("td", null, v)); });
+      var td = el("td"), sw = el("button", "switch" + (g.enabled ? " on" : ""));
+      sw.setAttribute("aria-label", "Bot in " + g.name);
+      sw.onclick = function () { g.enabled = !g.enabled; renderGroups(); renderStats(); };
+      td.appendChild(sw); tr.appendChild(td); tb.appendChild(tr);
+    });
+  }
+
+  function renderRules() {
+    var box = $("#rules"); box.innerHTML = "";
+    rules.forEach(function (r) {
+      var row = el("div", "rule");
+      var left = el("div");
+      left.appendChild(el("span", "tag", r.type === "hours" ? "outside hours" : r.type));
+      left.appendChild(el("b", null, r.name));
+      left.appendChild(el("span", "muted", "  " + (r.type === "hours" ? "working hours " : "") + r.trigger + " · " + (r.groups === "all" ? "all groups" : r.groups.map(groupName).join(", "))));
+      var sw = el("button", "switch" + (r.enabled ? " on" : ""));
+      sw.setAttribute("aria-label", "Rule " + r.name);
+      sw.onclick = function () { r.enabled = !r.enabled; renderRules(); };
+      row.appendChild(left); row.appendChild(sw);
+      row.appendChild(el("div", "reply", "Reply: " + r.reply));
+      box.appendChild(row);
+    });
+  }
+
+  function renderStats() {
+    $("#s-msgs").textContent = stats.msgs;
+    $("#s-replies").textContent = stats.replies;
+    $("#s-groups").textContent = groups.filter(function (g) { return g.enabled; }).length + " of " + groups.length;
+    $("#s-latency").textContent = stats.replies ? Math.round(stats.latencySum / stats.replies) + " ms" : "-";
+  }
+
+  function renderFeed() {
+    var q = $("#search").value.toLowerCase().trim(), feed = $("#feed"); feed.innerHTML = "";
+    log.filter(function (e) { return !q || e.hay.indexOf(q) !== -1; }).slice(0, 80).forEach(function (e) {
+      var d = el("div", "ev"), top = el("div", "top");
+      top.appendChild(el("span", null, e.group + " · " + e.sender)); top.appendChild(el("span", null, time(e.at)));
+      d.appendChild(top); d.appendChild(el("div", "msg", e.text));
+      if (e.kind === "reply") d.appendChild(el("div", "bot", "Bot (" + e.reason.replace("rule: ", "") + ", " + e.latency + " ms): " + e.reply));
+      else if (e.kind === "queued") d.appendChild(el("div", "warn", "Queued: bot is disconnected"));
+      else d.appendChild(el("div", "skip", "No reply: " + e.reason));
+      feed.appendChild(d);
+    });
+  }
+
+  function incoming() {
+    var g = groups[Math.floor(Math.random() * groups.length)];
+    var pool = samples[g.id], pick = pool[Math.floor(Math.random() * pool.length)];
+    var now = new Date(), entry = { group: g.name, sender: pick[0], text: pick[1], at: now };
+    g.last = now; stats.msgs++;
+    if (!connected) { entry.kind = "queued"; queue++; }
+    else {
+      var d = Rules.decide(rules, groups, { groupId: g.id, text: pick[1] }, now);
+      entry.reason = d.reason;
+      if (d.reply) {
+        entry.kind = "reply"; entry.reply = d.reply; entry.latency = 300 + Math.floor(Math.random() * 600);
+        stats.replies++; stats.latencySum += entry.latency;
+      } else entry.kind = "skip";
+    }
+    entry.hay = (entry.group + " " + entry.sender + " " + entry.text + " " + (entry.reply || "")).toLowerCase();
+    log.unshift(entry);
+    renderFeed(); renderStats(); renderGroups();
+    if (!connected) $("#alert-text").textContent = "Bot disconnected. Replies are paused, " + queue + " message" + (queue === 1 ? "" : "s") + " queued.";
+  }
+
+  function setConnected(on) {
+    connected = on;
+    var p = $("#status");
+    p.className = "pill " + (on ? "ok" : "bad");
+    p.lastChild.textContent = on ? "Connected" : "Disconnected";
+    $("#alert").classList.toggle("on", !on);
+    if (on) queue = 0;
+  }
+
+  function fillGroupSelects() {
+    [$("#r-group"), $("#t-group")].forEach(function (s, i) {
+      if (i === 0) s.appendChild(new Option("All groups", "all"));
+      groups.forEach(function (g) { s.appendChild(new Option(g.name, g.id)); });
+    });
+  }
+
+  $("#r-type").onchange = function () {
+    $("#r-trigger").placeholder = { keyword: "price, how much (keywords, comma separated)", exact: "the whole message, e.g. rules", hours: "working hours, e.g. 09:00-18:00" }[this.value];
+  };
+  $("#add-rule").onsubmit = function (e) {
+    e.preventDefault();
+    var type = $("#r-type").value, trigger = $("#r-trigger").value.trim(), g = $("#r-group").value;
+    if (type === "hours" && !/^\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}$/.test(trigger)) { alert("Use hours like 09:00-18:00"); return; }
+    rules.push({ id: Date.now(), name: type === "hours" ? "After hours" : trigger.split(",")[0].trim(), type: type, trigger: trigger, reply: $("#r-reply").value.trim(), groups: g === "all" ? "all" : [g], enabled: true });
+    this.reset(); renderRules(); renderGroups();
+  };
+  $("#t-run").onclick = function () {
+    var text = $("#t-text").value.trim(); if (!text) return;
+    var d = Rules.decide(rules, groups, { groupId: $("#t-group").value, text: text }, new Date());
+    $("#t-out").textContent = d.reply ? "Bot replies (" + d.reason + "): " + d.reply : "Bot stays silent: " + d.reason + ".";
+  };
+  $("#t-text").onkeydown = function (e) { if (e.key === "Enter") $("#t-run").click(); };
+  $("#search").oninput = renderFeed;
+  $("#disconnect").onclick = function () { setConnected(false); $("#alert-text").textContent = "Bot disconnected at " + time(new Date()) + ". Replies are paused and incoming messages are queued."; };
+  $("#reconnect").onclick = function () { setConnected(true); };
+
+  fillGroupSelects(); renderGroups(); renderRules(); renderStats();
+  for (var i = 0; i < 9; i++) incoming();
+  setInterval(incoming, 2500);
+})();
+</script>
+</body>
+</html>

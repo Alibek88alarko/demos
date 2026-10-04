@@ -1,0 +1,7 @@
+{
+  "name": "claude-chat-starter",
+  "private": true,
+  "type": "module",
+  "dependencies": { "@anthropic-ai/sdk": "latest" },
+  "scripts": { "test": "node lib/budget.test.mjs" }
+}

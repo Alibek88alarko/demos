@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Attachment Coach · Demo</title>
+<meta name="description" content="Attachment-style quiz with an AI coaching chat. The Claude key lives in a server function with a monthly spending cap; email capture goes to Kit. Demo mode with canned replies.">
+<style>
+  :root { --bg: #f6f3f8; --card: #fff; --ink: #221d2b; --soft: #6a6276; --line: #e6dfec; --accent: #6b4fa0; --accent-soft: #efe8f8; --ok: #1f7a4d; --warn: #9a5b00; --warn-soft: #fff3dc; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .flag { background: var(--ink); color: #eee6f6; text-align: center; font-size: 13px; padding: 6px 12px; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 18px 16px 40px; }
+  h1 { font-size: 24px; margin: 6px 0 4px; }
+  .sub { color: var(--soft); margin: 0 0 16px; font-size: 15px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+  .step { display: none; } .step.on { display: block; }
+  .progress { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin-bottom: 14px; }
+  .progress i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+  .q { font-size: 19px; font-weight: 700; margin: 0 0 12px; }
+  .opt { display: block; width: 100%; text-align: left; padding: 13px 14px; margin-bottom: 8px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; font: inherit; color: var(--ink); cursor: pointer; }
+  .opt:hover { border-color: var(--accent); }
+  .btn { display: block; width: 100%; padding: 13px; border: 0; border-radius: 12px; background: var(--accent); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+  .btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--line); }
+  input { width: 100%; font: inherit; padding: 12px; border: 1.5px solid var(--line); border-radius: 12px; margin-bottom: 10px; color: var(--ink); }
+  .tag { display: inline-block; background: var(--accent-soft); color: var(--accent); font-weight: 700; padding: 4px 10px; border-radius: 99px; }
+  .note { color: var(--soft); font-size: 13px; margin-top: 8px; }
+  pre { background: #f4f0f8; border-radius: 10px; padding: 10px; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 8px 0 0; }
+  .chat { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow: auto; margin-bottom: 10px; }
+  .msg { padding: 10px 12px; border-radius: 14px; max-width: 85%; font-size: 15px; }
+  .msg.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+  .msg.bot { align-self: flex-start; background: var(--accent-soft); border-bottom-left-radius: 4px; }
+  .msg.warn { align-self: stretch; background: var(--warn-soft); color: var(--warn); max-width: 100%; }
+  .row { display: flex; gap: 8px; }
+  .row input { margin: 0; }
+  .row .btn { width: auto; padding: 0 18px; }
+  .meter { display: flex; justify-content: space-between; font-size: 13px; color: var(--soft); margin-top: 10px; gap: 10px; flex-wrap: wrap; }
+  .bar { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin-top: 4px; }
+  .bar i { display: block; height: 100%; background: var(--ok); width: 0; }
+  .tools { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .tools button { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 9px; border: 1px solid var(--line); background: #fff; cursor: pointer; color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="flag">Demo mode · canned coach replies, no API key in this page, nothing is sent to Kit</div>
+<div class="wrap">
+  <h1>What's your attachment style?</h1>
+  <p class="sub">Six quick questions, then a short chat with an AI coach about your result.</p>
+
+  <div class="card">
+    <div class="progress"><i id="bar"></i></div>
+    <div id="quiz"></div>
+
+    <div class="step" id="capture">
+      <p class="q">Your result is ready</p>
+      <p class="sub">Where should we send your full result and tips?</p>
+      <input id="name" placeholder="First name" autocomplete="given-name">
+      <input id="email" type="email" placeholder="Email" autocomplete="email">
+      <button class="btn" id="send">Show my result</button>
+      <div class="note" id="cap-err"></div>
+    </div>
+
+    <div class="step" id="result">
+      <p class="q">You lean <span class="tag" id="style"></span></p>
+      <p id="blurb"></p>
+      <div class="note">Sent to Kit by the server function (shown here instead):</div>
+      <pre id="kit"></pre>
+    </div>
+  </div>
+
+  <div class="card step" id="coach">
+    <p class="q" style="margin-bottom:8px">Talk it through with the coach</p>
+    <div class="chat" id="chat"></div>
+    <div class="row">
+      <input id="say" placeholder="Ask about your result..." maxlength="1000">
+      <button class="btn" id="go">Send</button>
+    </div>
+    <div class="meter">
+      <span id="spend">This month: $0.0000 of $20.00 cap</span>
+      <span id="turns">0 of 20 messages</span>
+    </div>
+    <div class="bar"><i id="spendbar"></i></div>
+    <div class="tools">
+      <button id="outage">Simulate API outage</button>
+      <button id="capit">Simulate cap reached</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var QUESTIONS = [
+    ["When a partner doesn't text back for hours, I...", ["Assume they're busy", "Feel anxious and check my phone a lot", "Feel relieved to have space", "Swing between worry and pulling away"]],
+    ["Talking about feelings with someone close feels...", ["Natural", "Necessary, I need reassurance", "Uncomfortable, I'd rather not", "Scary, even when I want it"]],
+    ["When things get serious in a relationship, I...", ["Lean in", "Worry they'll leave", "Start to feel trapped", "Want closeness, then push it away"]],
+    ["After an argument, I usually...", ["Talk it out and move on", "Need to fix it right away", "Go quiet for a while", "Feel overwhelmed and unsure"]],
+    ["Depending on others is...", ["Fine, it goes both ways", "Something I want but fear", "Something I avoid", "Confusing for me"]],
+    ["My past relationships felt mostly...", ["Steady", "Intense and uncertain", "Distant", "Up and down"]]
+  ];
+  var STYLES = ["Secure", "Anxious", "Avoidant", "Fearful"];
+  var BLURB = {
+    Secure: "You tend to trust, talk things through and give space without panic.",
+    Anxious: "You care deeply and notice every signal, and silence can feel like a threat.",
+    Avoidant: "You value independence, and closeness can start to feel like pressure.",
+    Fearful: "You want closeness and fear it at the same time, so it can feel like a tug of war."
+  };
+  var CANNED = {
+    Secure: ["That steadiness is a real strength. What's one situation where you still feel shaky?", "Good instinct. How do you usually let the other person know you're there?"],
+    Anxious: ["That makes sense, waiting can feel endless. What story does your mind tell you while you wait?", "One small step: name the feeling before you act on it. What would you say to yourself next time?"],
+    Avoidant: ["Needing space is okay. What tends to happen right before you pull back?", "Could you try saying 'I need an hour' instead of going quiet? How would that feel?"],
+    Fearful: ["Wanting both closeness and distance is exhausting. When did you last feel safe with someone?", "Let's slow it down. What's one sign that tells you someone is trustworthy?"]
+  };
+  var pending = null, answers = [], style = null, msgs = [], spend = 0, cap = 20, outage = false, capped = false, i = 0;
+  function $(s) { return document.querySelector(s); }
+  function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+
+  function showQ() {
+    $("#bar").style.width = Math.round(i / QUESTIONS.length * 100) + "%";
+    var box = $("#quiz"); box.innerHTML = "";
+    if (i >= QUESTIONS.length) { $("#capture").classList.add("on"); return; }
+    box.appendChild(el("p", "q", QUESTIONS[i][0]));
+    QUESTIONS[i][1].forEach(function (a, k) {
+      var b = el("button", "opt", a);
+      b.onclick = function () { answers.push(k); i++; showQ(); };
+      box.appendChild(b);
+    });
+  }
+
+  function score() {
+    var c = [0, 0, 0, 0]; answers.forEach(function (k) { c[k]++; });
+    return STYLES[c.indexOf(Math.max.apply(null, c))];
+  }
+
+  $("#send").onclick = function () {
+    var email = $("#email").value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { $("#cap-err").textContent = "Please enter a valid email."; return; }
+    style = score();
+    $("#capture").classList.remove("on"); $("#result").classList.add("on"); $("#bar").style.width = "100%";
+    $("#style").textContent = style; $("#blurb").textContent = BLURB[style];
+    $("#kit").textContent = "POST https://api.kit.com/v4/subscribers\n" + JSON.stringify({ email_address: email, first_name: $("#name").value.trim() }) +
+      "\nPOST https://api.kit.com/v4/tags/{" + style.toUpperCase() + "_TAG_ID}/subscribers\n" + JSON.stringify({ email_address: email });
+    $("#coach").classList.add("on");
+    add("bot", "Hi" + ($("#name").value.trim() ? " " + $("#name").value.trim() : "") + "! Your result leans " + style + ". What would you like to understand better?");
+  };
+
+  function add(kind, text) { var m = el("div", "msg " + kind, text); $("#chat").appendChild(m); $("#chat").scrollTop = 1e6; }
+  function meter() {
+    $("#spend").textContent = "This month: $" + spend.toFixed(4) + " of $" + cap.toFixed(2) + " cap";
+    $("#spendbar").style.width = Math.min(100, spend / cap * 100) + "%";
+    $("#turns").textContent = msgs.filter(function (m) { return m.role === "user"; }).length + " of 20 messages";
+  }
+
+  // Mirrors what api/chat.js returns: reply, capped, or a retryable error.
+  function fakeServer(text) {
+    return new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        if (outage) return reject({ retry: true });
+        if (capped || spend >= cap) return resolve({ reply: "The coach is resting for the rest of the month. Please check back soon!", capped: true });
+        var pool = CANNED[style], n = msgs.filter(function (m) { return m.role === "user"; }).length;
+        // cost estimate in the same way the server does: tokens x price (Opus 5.5: $4 in / $20 out per 1M)
+        spend += (1200 * 4 + 220 * 20) / 1e6;
+        resolve({ reply: pool[(n - 1) % pool.length] });
+      }, 500);
+    });
+  }
+
+  function send() {
+    var text = $("#say").value.trim(); if (!text) return;
+    if (msgs.filter(function (m) { return m.role === "user"; }).length >= 20) { add("warn", "We've covered a lot! Start a new chat any time."); return; }
+    $("#say").value = ""; if (text !== pending) add("user", text); pending = null; msgs.push({ role: "user", content: text });
+    fakeServer(text).then(function (r) {
+      add(r.capped ? "warn" : "bot", r.reply); msgs.push({ role: "assistant", content: r.reply }); meter();
+    }, function () {
+      msgs.pop(); pending = text; add("warn", "The coach is taking a moment. Your quiz result is saved, tap Send again to retry.");
+      $("#say").value = text;
+    });
+  }
+  $("#go").onclick = send;
+  $("#say").onkeydown = function (e) { if (e.key === "Enter") send(); };
+  $("#outage").onclick = function () { outage = !outage; this.textContent = outage ? "End API outage" : "Simulate API outage"; };
+  $("#capit").onclick = function () { capped = true; spend = cap; meter(); };
+  showQ(); meter();
+})();
+</script>
+</body>
+</html>

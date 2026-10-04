@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Demos · Alibek Kozhatayev</title>
+<meta name="description" content="Working demos of automations and small web tools. Sample data only.">
+<style>
+  :root { --ink: #1d232b; --soft: #55606d; --paper: #f7f4ef; --card: #fff; --line: #e4ded4; --accent: #b5683f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 32px 18px 48px; }
+  h1 { font-size: 30px; margin: 0 0 6px; }
+  .lead { color: var(--soft); margin: 0 0 24px; }
+  .grid { display: grid; gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+  .card h2 { font-size: 19px; margin: 0 0 6px; }
+  .card p { margin: 0 0 12px; color: var(--soft); font-size: 15px; }
+  .links { display: flex; gap: 10px; flex-wrap: wrap; }
+  .links a { text-decoration: none; font-weight: 600; font-size: 15px; padding: 8px 14px; border-radius: 10px; border: 1.5px solid var(--line); color: var(--ink); }
+  .links a.live { background: var(--accent); border-color: var(--accent); color: #fff; }
+  footer { margin-top: 28px; color: var(--soft); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Demos</h1>
+  <p class="lead">Working demos of automations and small web tools. All of them run on sample data.</p>
+  <div class="grid">
+    <div class="card">
+      <h2>Tiling quote calculator</h2>
+      <p>Mobile site for a tiling business. Customers answer a few questions and get a price range calculated only from the owner's price list. One tap opens WhatsApp with the job details typed in.</p>
+      <div class="links">
+        <a class="live" href="https://alibek88alarko.github.io/trades-quote-calculator/">Try it</a>
+        <a href="https://github.com/Alibek88alarko/trades-quote-calculator">Code</a>
+      </div>
+    </div>
+    <div class="card">
+      <h2>SEO and AI-search site audit</h2>
+      <p>Takes a website address, runs 23 checks across SEO, technical, local and AI-search readiness, and writes a 0 to 100 score with a plain report for the business owner.</p>
+      <div class="links"><a href="https://github.com/Alibek88alarko/seo-aeo-site-audit">Code and sample report</a></div>
+    </div>
+    <div class="card">
+      <h2>Invoice PDFs to one Excel file</h2>
+      <p>Pulls line items from invoice PDFs into one spreadsheet and checks them against each invoice total. Anything that doesn't add up goes to a Check sheet with the reason.</p>
+      <div class="links"><a href="https://github.com/Alibek88alarko/invoice-pdf-to-excel">Code and screenshot</a></div>
+    </div>
+    <div class="card">
+      <h2>GoHighLevel workflow email stats</h2>
+      <p>Every email step of every workflow in one Google Sheet: sent, delivered, opened, clicked, bounces and rates, built on the HighLevel Email API.</p>
+      <div class="links"><a href="https://github.com/Alibek88alarko/ghl-workflow-email-stats">Code</a></div>
+    </div>
+  </div>
+  <footer>Alibek Kozhatayev · sample data only</footer>
+</div>
+</body>
+</html>

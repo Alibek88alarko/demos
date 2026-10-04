@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Distressed Lead Stacker · Demo</title>
+<meta name="description" content="Merges probate, code enforcement and tax delinquency lists by address and ranks the properties that appear on more than one list. Demo with sample data.">
+<style>
+  :root { --bg: #f5f4f1; --card: #fff; --ink: #1c2026; --soft: #5f6670; --line: #e3e0da; --hot: #b3261e; --warm: #b86e00; --cool: #2f6f9f; --accent: #1f5c4d; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .flag { background: var(--ink); color: #e7e3dc; text-align: center; font-size: 13px; padding: 6px 12px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 18px 40px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .lead { color: var(--soft); margin: 0 0 18px; max-width: 760px; }
+  .sources { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 760px) { .sources { grid-template-columns: 1fr; } }
+  .src { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .src b { display: block; }
+  .src span { color: var(--soft); font-size: 13px; }
+  .src .n { font-size: 22px; font-weight: 800; }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+  .bar input, .bar select { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink); }
+  .bar input { flex: 1; min-width: 200px; }
+  .btn { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 9px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  .summary { color: var(--soft); font-size: 14px; margin-bottom: 10px; }
+  .lead-row { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; display: grid; grid-template-columns: 64px 1fr; gap: 12px; }
+  .score { border-radius: 10px; color: #fff; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; height: 56px; }
+  .hot { background: var(--hot); } .warm { background: var(--warm); } .cool { background: var(--cool); }
+  .addr { font-weight: 700; }
+  .owner { color: var(--soft); font-size: 13px; }
+  .chips { margin: 6px 0; display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 3px 8px; border-radius: 6px; background: #eeebe5; color: var(--soft); }
+  .chip.probate { background: #f6e3e1; color: var(--hot); }
+  .chip.code { background: #f7ecd9; color: var(--warm); }
+  .chip.tax { background: #e2edf5; color: var(--cool); }
+  ul.why { margin: 4px 0 0; padding-left: 18px; color: var(--soft); font-size: 13px; }
+  details { margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  summary { font-weight: 700; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  td, th { text-align: left; padding: 5px 6px; border-top: 1px solid var(--line); }
+  th { color: var(--soft); }
+  .note { color: var(--soft); font-size: 13px; margin-top: 18px; }
+</style>
+</head>
+<body>
+<div class="flag">Demo · invented sample records in the shape of Clark County, NV lists. Not real people or cases.</div>
+<div class="wrap">
+  <h1>Distressed Lead Stacker</h1>
+  <p class="lead">Three public distress lists come in with addresses written three different ways. The stacker matches them by address, adds up the signals for each house and ranks the ones that appear on more than one list. Every score shows where it came from.</p>
+
+  <div class="sources" id="sources"></div>
+
+  <div class="bar">
+    <input id="q" placeholder="Search address or owner">
+    <select id="min">
+      <option value="0">All leads</option>
+      <option value="60">Score 60+</option>
+      <option value="90">Score 90+ (hot)</option>
+    </select>
+    <select id="lists">
+      <option value="1">On 1+ lists</option>
+      <option value="2">On 2+ lists (stacked)</option>
+      <option value="3">On all 3 lists</option>
+    </select>
+    <button class="btn" id="csv">Download CSV</button>
+  </div>
+  <div class="summary" id="summary"></div>
+  <div id="leads"></div>
+
+  <details>
+    <summary>Scoring rules (editable per investor)</summary>
+    <table id="weights"><thead><tr><th>Signal</th><th>Points</th></tr></thead><tbody></tbody></table>
+  </details>
+  <details>
+    <summary>Raw input lists</summary>
+    <div id="raw"></div>
+  </details>
+  <p class="note">In production the lists are pulled on a schedule from the county sources or a list vendor, and the ranked sheet goes to Google Sheets or the CRM every morning.</p>
+</div>
+
+<script src="stacker.js"></script>
+<script src="sample-data.js"></script>
+<script>
+(function () {
+  var rows = Stacker.stack(SAMPLE);
+  var LABEL = { probate: "Probate", code: "Code enforcement", tax: "Tax delinquent" };
+  function $(s) { return document.querySelector(s); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  Object.keys(SAMPLE).forEach(function (k) {
+    var c = el("div", "src");
+    c.appendChild(el("span", null, LABEL[k] + " list"));
+    c.appendChild(el("div", "n", SAMPLE[k].length + " records"));
+    c.appendChild(el("span", null, k === "probate" ? "Case number, filing date, estate" : k === "code" ? "Violation, lien amount" : "Parcel, amount due, years"));
+    $("#sources").appendChild(c);
+  });
+
+  function filtered() {
+    var q = $("#q").value.toLowerCase().trim(), min = +$("#min").value, nl = +$("#lists").value;
+    return rows.filter(function (r) {
+      return r.score >= min && r.lists.length >= nl && (!q || (r.address + " " + r.owner).toLowerCase().indexOf(q) !== -1);
+    });
+  }
+
+  function render() {
+    var list = filtered(), box = $("#leads"); box.innerHTML = "";
+    var stacked = rows.filter(function (r) { return r.lists.length > 1; }).length;
+    var total = Object.keys(SAMPLE).reduce(function (s, k) { return s + SAMPLE[k].length; }, 0);
+    $("#summary").textContent = total + " records in, " + rows.length + " unique properties after address matching, " + stacked + " on more than one list. Showing " + list.length + ".";
+    list.forEach(function (r) {
+      var row = el("div", "lead-row");
+      row.appendChild(el("div", "score " + (r.score >= 90 ? "hot" : r.score >= 60 ? "warm" : "cool"), r.score));
+      var body = el("div");
+      body.appendChild(el("div", "addr", r.address));
+      if (r.owner) body.appendChild(el("div", "owner", r.owner));
+      var chips = el("div", "chips");
+      r.lists.forEach(function (l) { chips.appendChild(el("span", "chip " + l, LABEL[l])); });
+      body.appendChild(chips);
+      var ul = el("ul", "why");
+      r.reasons.forEach(function (x) { ul.appendChild(el("li", null, x)); });
+      body.appendChild(ul);
+      row.appendChild(body); box.appendChild(row);
+    });
+  }
+
+  var names = { probate: "Probate case", probate_foreclosure: "Notice of default on probate property", code_violation: "Code violation", code_lien: "Violation became a lien", tax_delinquent: "Tax delinquent", stack_bonus: "Each extra list", years_owned_20: "Owned 20+ years" };
+  Object.keys(Stacker.DEFAULT_WEIGHTS).forEach(function (k) {
+    var tr = el("tr"); tr.appendChild(el("td", null, names[k])); tr.appendChild(el("td", null, "+" + Stacker.DEFAULT_WEIGHTS[k]));
+    $("#weights tbody").appendChild(tr);
+  });
+  Object.keys(SAMPLE).forEach(function (k) {
+    $("#raw").appendChild(el("h4", null, LABEL[k]));
+    var t = el("table"), head = el("tr"), cols = Object.keys(SAMPLE[k][0]);
+    cols.forEach(function (c) { head.appendChild(el("th", null, c)); });
+    t.appendChild(head);
+    SAMPLE[k].forEach(function (rec) {
+      var tr = el("tr"); cols.forEach(function (c) { tr.appendChild(el("td", null, rec[c] === undefined ? "" : String(rec[c]))); }); t.appendChild(tr);
+    });
+    $("#raw").appendChild(t);
+  });
+
+  $("#q").oninput = render; $("#min").onchange = render; $("#lists").onchange = render;
+  $("#csv").onclick = function () {
+    var blob = new Blob([Stacker.toCSV(filtered())], { type: "text/csv" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "stacked-leads.csv"; a.click();
+  };
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+const assert = require("assert");
+const KB = require("./kb.js"); const { STORE_KB } = require("./data.js");
+let n = 0; const t = (name, fn) => { fn(); n++; console.log("ok", name); };
+const a = q => KB.answer(STORE_KB, q);
+t("return window from FAQ", () => { const r = a("Can I return a duvet cover I don't like?"); assert.match(r.sources[0].label, /FAQ: Return policy|FAQ: How to return/); assert.ok(!r.handover); });
+t("refund timing maps to refund entry", () => assert.strictEqual(a("When will I get my refund?").sources[0].id, "F6"));
+t("shipping time", () => assert.strictEqual(a("How long does delivery take?").sources[0].id, "F1"));
+t("king duvet out of stock from catalog", () => { const r = a("Do you have the linen duvet in king?"); assert.match(r.text, /Out of stock: King/); assert.strictEqual(r.sources[0].id, "HW-101"); });
+t("rug sizes from catalog fields", () => { const r = a("What sizes does the jute rug come in?"); assert.match(r.text, /8 x 10 ft \(96 x 120 in\)/); });
+t("candle price", () => assert.match(a("How much is the cedar candle?").text, /\$32/));
+t("unknown question hands over, no guess", () => { const r = a("Can I pay with bitcoin?"); assert.ok(r.handover); assert.strictEqual(r.sources.length, 0); });
+t("unknown product hands over", () => assert.ok(a("Do you sell office chairs?").handover));
+t("edited FAQ is used immediately", () => { const kb = JSON.parse(JSON.stringify(STORE_KB)); kb[3].answer = "Returns accepted within 60 days."; assert.match(KB.answer(kb, "what is your return policy").text, /60 days/); });
+console.log(n + " tests passed");

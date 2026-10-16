@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>WhatsApp Webhook Check</title>
+<meta name="description" content="Read-only check for WhatsApp Cloud API webhooks: why dashboard test events arrive but real messages do not.">
+<style>
+  :root { --ink:#1d232b; --soft:#55606d; --paper:#f7f4ef; --card:#fff; --line:#e4ded4; --accent:#b5683f; --code:#1e2329; --codeink:#e8e6e1; }
+  @media (prefers-color-scheme: dark) { :root { --ink:#ece8e1; --soft:#a9a39a; --paper:#171a1e; --card:#20242a; --line:#343a42; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:17px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  .wrap { max-width:760px; margin:0 auto; padding:32px 16px 48px; }
+  h1 { font-size:30px; margin:0 0 6px; } h2 { font-size:20px; margin:28px 0 8px; }
+  .lead { color:var(--soft); margin:0 0 18px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin:12px 0; }
+  ol li { margin:6px 0; }
+  code { font-family:Consolas,Menlo,monospace; font-size:14px; background:rgba(127,127,127,.15); padding:1px 5px; border-radius:5px; }
+  pre { background:var(--code); color:var(--codeink); padding:14px 16px; border-radius:12px; overflow-x:auto; font:13.5px/1.5 Consolas,Menlo,monospace; white-space:pre; }
+  .btn { display:inline-block; text-decoration:none; font-weight:600; padding:9px 15px; border-radius:10px; background:var(--accent); color:#fff; margin:4px 8px 4px 0; }
+  .btn.alt { background:transparent; color:var(--ink); border:1.5px solid var(--line); }
+  .note { color:var(--soft); font-size:14px; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="note"><a href="../">All demos</a></p>
+  <h1>WhatsApp Webhook Check</h1>
+  <p class="lead">Dashboard test events reach your server, real customer messages do not, and the Graph API answers with error 100, subcode 33. This small script finds which of the usual causes it is, using read-only requests.</p>
+  <a class="btn" href="wa-check.mjs" download>Download wa-check.mjs</a>
+  <a class="btn alt" href="https://github.com/Alibek88alarko/demos/tree/main/whatsapp-webhook-check">Source and tests</a>
+
+  <h2>What it checks</h2>
+  <div class="card"><ol>
+    <li><b>App not subscribed to the WABA.</b> Subscribing to the <code>messages</code> field in the App Dashboard is not enough, the app also needs <code>POST /{waba-id}/subscribed_apps</code>. Without it only test events arrive.</li>
+    <li><b>Token without access to the WABA.</b> A System User token that is not assigned to this WhatsApp account, or lacks <code>whatsapp_business_management</code>, gets error 100/33 on <code>GET /{waba-id}</code>.</li>
+    <li><b>Callback override.</b> An override on the WABA or on one phone number, often left over from a previous provider, sends events to another URL.</li>
+    <li><b>Number not on Cloud API, or app in Development mode.</b> The first is checked from <code>platform_type</code>, the second is a reminder because the token cannot read it.</li>
+  </ol></div>
+
+  <h2>How to run</h2>
+  <div class="card">
+    <p>Node.js 18 or newer. The token stays on your machine: it is read from an environment variable, used only for GET requests to <code>graph.facebook.com</code>, and never printed. Nothing in your setup is changed; when a fix is needed the script prints the command for you to run.</p>
+<pre>export WA_TOKEN="your system user token"
+export WABA_ID="WhatsApp Business Account ID"
+export PHONE_NUMBER_ID="optional, to check one number"
+export APP_ID="optional, to confirm it is your app that is subscribed"
+node wa-check.mjs</pre>
+    <p class="note">On Windows PowerShell use <code>$env:WA_TOKEN="..."</code> instead of <code>export</code>. Graph API version defaults to v23.0, set <code>GRAPH_VERSION</code> to change it.</p>
+  </div>
+
+  <h2>Example output</h2>
+  <p class="note">From the test suite with mocked Graph API responses, not a real account.</p>
+<pre>[OK  ] Token is valid and has both WhatsApp permissions
+[OK  ] WABA reachable: Sample Delivery Co
+[FAIL] No app is subscribed to this WABA
+       The webhook field subscription in the App Dashboard is not enough: the app also has to be subscribed to the WABA, otherwise only dashboard test events arrive.
+       Fix: curl -X POST &quot;https://graph.facebook.com/v23.0/104857600000001/subscribed_apps&quot; -H &quot;Authorization: Bearer $WA_TOKEN&quot;
+[WARN] +1 555 010 0199 (Sample Delivery) has a callback override
+       Effective callback: https://old-provider.example/webhook
+       Fix: If this URL is not yours (often a previous provider), remove or replace the override for this number only.
+[INFO] Check App Mode by hand
+       App Dashboard top bar: the app should be Live. In Development mode only dashboard test events are delivered.</pre>
+
+  <p class="note">Built by Alibek Kozhatayev. Read-only by design, MIT licensed.</p>
+</div>
+</body>
+</html>

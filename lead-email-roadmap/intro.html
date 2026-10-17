@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>How we work · Brightline Studio</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #eef2f5; color: #1d2b36; font: 16px/1.55 Arial, Helvetica, sans-serif; }
+  header { background: #0f2a3d; color: #fff; padding: 16px 20px; font-weight: bold; font-size: 18px; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 40px; }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  p { color: #4a5a66; margin: 0 0 16px; }
+  .player { position: relative; aspect-ratio: 16 / 9; background: #0f2a3d; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #9fc3d8; text-align: center; padding: 16px; }
+  .player .btn { width: 72px; height: 72px; border-radius: 50%; background: #3fb6a8; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+  .player .btn::after { content: ""; border-left: 24px solid #fff; border-top: 15px solid transparent; border-bottom: 15px solid transparent; margin-left: 6px; }
+  .book { background: #fff; border-radius: 10px; padding: 18px; margin-top: 18px; }
+  .book h2 { font-size: 19px; margin: 0 0 10px; }
+  .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+  .slots button { font: inherit; padding: 10px; border-radius: 8px; border: 1.5px solid #3fb6a8; background: #fff; color: #0f2a3d; cursor: pointer; }
+  .slots button.on { background: #3fb6a8; color: #fff; }
+  .note { font-size: 13px; color: #7a8a96; margin-top: 12px; }
+</style>
+</head>
+<body>
+<header>Brightline Studio</header>
+<div class="wrap">
+  <h1>How we work, in 90 seconds</h1>
+  <p>Watch the short intro, then pick a time for your 20-minute discovery call.</p>
+  <div class="player">
+    <div><div class="btn"></div>Your unlisted Vimeo or Bunny Stream player goes here<br><small>(no YouTube branding, no suggested videos)</small></div>
+  </div>
+  <div class="book" id="book">
+    <h2>Pick a time</h2>
+    <div class="slots">
+      <button>Mon 10:00</button><button>Mon 14:30</button><button>Tue 11:00</button><button>Wed 09:30</button><button>Thu 16:00</button><button>Fri 12:00</button>
+    </div>
+    <p class="note">Here goes the real booking embed (Calendly or a Google Calendar booking page). When a lead books, the automation marks their row in the sheet, so they never get the follow-up email.</p>
+  </div>
+</div>
+<script>
+  document.querySelectorAll(".slots button").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".slots button").forEach((x) => x.classList.toggle("on", x === b));
+  }));
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Lead email kit · Demos</title>
+<meta name="description" content="Instant auto-reply with a 4-step roadmap and a follow-up with an animated video thumbnail, built for Gmail and Outlook. Facebook Lead Ads to Gmail via Zapier or Make.">
+<style>
+  :root { --ink: #1d232b; --soft: #55606d; --paper: #f7f4ef; --card: #fff; --line: #e4ded4; --accent: #b5683f; --teal: #3fb6a8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px 16px 48px; }
+  a { color: var(--accent); }
+  h1 { font-size: 28px; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 28px 0 10px; }
+  .lead { color: var(--soft); margin: 0 0 18px; }
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 4px; font-size: 14px; }
+  .flow span { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; }
+  .flow b { color: var(--soft); font-weight: 400; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
+  .bar button, .bar select { font: inherit; font-size: 14px; padding: 7px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  .bar button.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .frame { background: #dfe6eb; border-radius: 14px; padding: 12px; overflow-x: auto; }
+  iframe { display: block; margin: 0 auto; border: 0; background: #eef2f5; width: 640px; max-width: 100%; height: 640px; border-radius: 8px; transition: width .2s; }
+  iframe.phone { width: 375px; }
+  .meta { font-size: 13px; color: var(--soft); margin: 6px 2px 0; }
+  ul { padding-left: 20px; margin: 6px 0; }
+  li { margin: 4px 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  code { background: #efe9df; padding: 1px 5px; border-radius: 5px; font-size: 14px; }
+  footer { margin-top: 28px; color: var(--soft); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p><a href="../">← All demos</a></p>
+  <h1>Lead email kit: instant reply + video follow-up</h1>
+  <p class="lead">Two emails for new Facebook Lead Ads leads, sent from a Google Workspace address. Table layout and inline styles, so Gmail and Outlook show the same thing. Fictional company, sample data.</p>
+
+  <div class="flow">
+    <span>Facebook Lead Ads</span><b>→</b><span>Zapier or Make</span><b>→</b><span>Email 1 from Gmail, instantly</span><b>→</b><span>Lead logged in Google Sheet</span><b>→</b><span>Booking marks the row</span><b>→</b><span>After the delay: Email 2 only to leads not booked</span>
+  </div>
+
+  <h2>Email 1: instant auto-reply with a 4-step roadmap</h2>
+  <div class="bar">
+    <label for="industry">Industry version:</label>
+    <select id="industry">
+      <option value="dental">Dental clinics</option>
+      <option value="roofing">Roofing</option>
+      <option value="law">Law firms</option>
+    </select>
+    <button data-w="desktop" class="on">Desktop</button>
+    <button data-w="phone">Phone</button>
+  </div>
+  <div class="frame"><iframe id="e1" title="Email 1 preview"></iframe></div>
+  <p class="meta" id="m1"></p>
+
+  <h2>Email 2: follow-up with an animated video thumbnail</h2>
+  <div class="frame"><iframe id="e2" title="Email 2 preview"></iframe></div>
+  <p class="meta" id="m2"></p>
+
+  <h2>What's inside</h2>
+  <div class="card">
+    <ul>
+      <li><b>Gmail and Outlook.</b> Tables, inline styles, a bulletproof button (VML for Outlook desktop). Each email stays well under 100 KB, so Gmail doesn't clip it.</li>
+      <li><b>Animated thumbnail.</b> <a href="thumb.gif">thumb.gif</a>, 8 frames, about 13 KB. The play button is on frame one, because older Outlook shows only the first frame.</li>
+      <li><b>Video page on your domain.</b> <a href="intro.html">intro.html</a>: player area for an unlisted Vimeo or Bunny Stream video (no YouTube branding or suggested videos) with the booking calendar right below.</li>
+      <li><b>Versions per industry.</b> One template, a few fields: <code>{{industry_line}}</code>, <code>{{industry_name}}</code>, plus <code>{{first_name}}</code> from the lead form. A new version is a new row of text, not a new email.</li>
+      <li><b>Who gets Email 2.</b> Every lead goes into a Google Sheet. The booking tool (Calendly or a Google Calendar booking page) marks the row. After the delay, the scenario sends Email 2 only to rows still unmarked.</li>
+    </ul>
+  </div>
+
+  <footer>Templates: <a href="email-autoreply.html">email-autoreply.html</a> · <a href="email-followup.html">email-followup.html</a> · thumbnail script <a href="make_thumb.py">make_thumb.py</a></footer>
+</div>
+<script>
+  const INDUSTRY = {
+    dental: { industry_name: "dental", industry_line: "Most clinics we work with fill their empty chair hours within a month." },
+    roofing: { industry_name: "roofing", industry_line: "Most roofers we work with stop losing weekend leads within a month." },
+    law: { industry_name: "legal", industry_line: "Most firms we work with answer every new inquiry within minutes." },
+  };
+  const BASE = {
+    company_name: "Brightline Studio", first_name: "Dana", company_address: "100 Example St, Miami, FL",
+    booking_url: "intro.html#book", video_page_url: "intro.html", thumb_gif_url: "thumb.gif",
+  };
+  const fill = (tpl, data) => tpl.replace(/\{\{(\w+)\}\}/g, (m, k) => (k in data ? data[k] : m));
+  const kb = (s) => (new Blob([s]).size / 1024).toFixed(1) + " KB";
+  let t1 = "", t2 = "";
+
+  function render() {
+    const data = { ...BASE, ...INDUSTRY[document.getElementById("industry").value] };
+    const h1 = fill(t1, data), h2 = fill(t2, data);
+    document.getElementById("e1").srcdoc = h1;
+    document.getElementById("e2").srcdoc = h2;
+    document.getElementById("m1").textContent = `Template ${kb(t1)} · subject: "${fill(t1.match(/<title>(.*?)<\/title>/)[1], data)}"`;
+    document.getElementById("m2").textContent = `Template ${kb(t2)} · subject: "${fill(t2.match(/<title>(.*?)<\/title>/)[1], data)}"`;
+  }
+
+  Promise.all([fetch("email-autoreply.html").then((r) => r.text()), fetch("email-followup.html").then((r) => r.text())])
+    .then(([a, b]) => { t1 = a; t2 = b; render(); })
+    .catch(() => { document.getElementById("m1").textContent = "Open the templates directly: email-autoreply.html, email-followup.html"; });
+
+  document.getElementById("industry").addEventListener("change", render);
+  document.querySelectorAll("[data-w]").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll("[data-w]").forEach((x) => x.classList.toggle("on", x === b));
+    document.querySelectorAll("iframe").forEach((f) => f.classList.toggle("phone", b.dataset.w === "phone"));
+  }));
+</script>
+</body>
+</html>

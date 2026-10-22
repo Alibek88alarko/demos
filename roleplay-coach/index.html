@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Role Play Coach · Demo</title>
+<meta name="description" content="One AI role play agent for many training scenarios: the learner talks to an AI customer, a second pass scores the conversation against the scenario rubric with quotes, then a PDF coaching guide and an xAPI statement for the LMS.">
+<style>
+  :root { --bg: #f4f5f7; --card: #fff; --ink: #1b2330; --soft: #5d6776; --line: #e1e4ea; --accent: #2f5d50; --accent-soft: #e6f0ec;
+    --me: #2f5d50; --them: #eef0f4; --flag: #b3261e; --flag-soft: #fbe9e7; --pass: #1f7a4d; --pass-soft: #e5f4ec; --warn: #9a5b00; --warn-soft: #fff3dc; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .flag-bar { background: var(--ink); color: #e6e9ef; text-align: center; font-size: 13px; padding: 6px 12px; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 18px 16px 40px; }
+  h1 { font-size: 23px; margin: 0 0 2px; }
+  .lead { color: var(--soft); margin: 0 0 14px; max-width: 860px; }
+  .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 14px; }
+  select, input, textarea, button { font: inherit; }
+  select, input[type=password], input[type=text] { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); max-width: 100%; }
+  button { padding: 7px 13px; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; font-weight: 600; }
+  button.main { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button:disabled { opacity: .5; cursor: default; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+  .card h2 { font-size: 15px; margin: 0 0 8px; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .card h2 small { font-weight: 400; color: var(--soft); font-size: 12px; }
+  .brief { font-size: 14px; color: var(--soft); margin: 0 0 10px; }
+  .brief b { color: var(--ink); }
+  .chat { display: flex; flex-direction: column; gap: 8px; max-height: 520px; overflow: auto; padding: 4px 2px; }
+  .msg { max-width: 85%; padding: 8px 11px; border-radius: 12px; font-size: 14.5px; white-space: pre-wrap; }
+  .msg .who { display: block; font-size: 11px; font-weight: 700; opacity: .75; margin-bottom: 2px; }
+  .msg.persona { background: var(--them); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg.learner { background: var(--me); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg.system { align-self: center; background: transparent; color: var(--soft); font-size: 13px; }
+  .composer { display: flex; gap: 8px; margin-top: 10px; }
+  .composer input { flex: 1; min-width: 0; }
+  .score-head { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .big { font-size: 40px; font-weight: 800; line-height: 1; }
+  .pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+  .pill.pass { background: var(--pass-soft); color: var(--pass); }
+  .pill.fail { background: var(--flag-soft); color: var(--flag); }
+  .pill.sample { background: var(--warn-soft); color: var(--warn); }
+  .row { border-top: 1px solid var(--line); padding: 9px 0; }
+  .row-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .dots { letter-spacing: 2px; color: var(--accent); font-size: 14px; white-space: nowrap; }
+  .quote { font-family: Georgia, "Times New Roman", serif; font-size: 14px; margin: 4px 0 2px; padding-left: 9px; border-left: 3px solid var(--line); }
+  .quote.ok::before { content: "✓ said in the call · "; font-family: inherit; font-size: 11px; color: var(--pass); font-weight: 700; }
+  .quote.bad::before { content: "⚠ not found in the call · "; font-family: inherit; font-size: 11px; color: var(--flag); font-weight: 700; }
+  .tip { font-size: 13.5px; color: var(--soft); margin: 0; }
+  ul.tight { margin: 4px 0 0; padding-left: 18px; font-size: 14px; }
+  .alert { background: var(--flag-soft); color: var(--flag); border-radius: 8px; padding: 8px 10px; font-size: 13.5px; margin: 8px 0; }
+  .note { background: var(--warn-soft); color: var(--warn); border-radius: 8px; padding: 8px 10px; font-size: 13px; margin: 8px 0; }
+  details { margin-top: 6px; }
+  summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+  textarea { width: 100%; min-height: 260px; font: 12.5px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+  pre { background: #10161f; color: #d7e0ea; font-size: 12px; padding: 10px; border-radius: 8px; overflow: auto; max-height: 300px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .muted { color: var(--soft); font-size: 13px; }
+  .lms p { font-size: 14px; margin: 0 0 6px; color: var(--soft); }
+  .lms b { color: var(--ink); }
+  footer { color: var(--soft); font-size: 13px; margin-top: 10px; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="flag-bar">Demo · sample data · runs in your browser, nothing is sent anywhere unless you add your own API key</div>
+<div class="wrap">
+  <h1>Role Play Coach</h1>
+  <p class="lead">One agent, many scenarios. The learner talks to an AI customer, a second pass scores the conversation against the scenario rubric and quotes the exact lines behind each score, then the learner gets a PDF coaching guide. The score goes to the LMS as an xAPI statement. Each scenario is a config, so trainers change scenarios without touching code.</p>
+
+  <div class="top">
+    <label class="muted" for="scenario">Scenario</label>
+    <select id="scenario"></select>
+    <button id="loadSample">Load sample session</button>
+    <button id="startLive" class="main">Start live role play</button>
+    <span id="modePill" class="pill sample">Sample session</span>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2 id="chatTitle">Conversation <small id="chatSub"></small></h2>
+        <p class="brief" id="brief"></p>
+        <div class="chat" id="chat"></div>
+        <div class="composer">
+          <input id="msg" type="text" placeholder="Start a live role play to type here" disabled>
+          <button id="send" class="main" disabled>Send</button>
+        </div>
+        <div class="actions">
+          <button id="endScore" disabled>End call and score</button>
+        </div>
+        <div id="chatError"></div>
+      </div>
+
+      <div class="card">
+        <h2>Scenario config <small>edit and apply, no code changes</small></h2>
+        <details>
+          <summary>Show JSON for this scenario</summary>
+          <textarea id="cfg" spellcheck="false"></textarea>
+          <div class="actions"><button id="applyCfg">Apply changes</button><button id="resetCfg">Reset</button></div>
+          <div id="cfgMsg"></div>
+        </details>
+      </div>
+
+      <div class="card">
+        <h2>Live mode <small>your own Anthropic API key</small></h2>
+        <p class="muted">The key stays in this browser tab (session storage) and calls go straight to the Claude API. In production the call runs through your server, so learners never see a key.</p>
+        <div class="actions">
+          <input id="apiKey" type="password" placeholder="sk-ant-..." autocomplete="off" style="flex:1;min-width:200px">
+          <select id="model">
+            <option value="claude-opus-5-5">claude-opus-5-5</option>
+            <option value="claude-sonnet-5-5">claude-sonnet-5-5</option>
+            <option value="claude-haiku-5-5">claude-haiku-5-5</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>Score <small id="scoreSub"></small></h2>
+        <div id="score"><p class="muted">Load the sample session or finish a live call to see the score.</p></div>
+        <div class="actions">
+          <button id="pdf" class="main" disabled>Download PDF coaching guide</button>
+          <button id="xapiBtn" disabled>Show xAPI statement</button>
+        </div>
+        <pre id="xapi" hidden></pre>
+      </div>
+
+      <div class="card lms">
+        <h2>How it plugs into the LMS</h2>
+        <p><b>Launch.</b> With LTI 1.3 the learner opens the role play from a course page, and the agent gets the learner ID and course from the launch.</p>
+        <p><b>Score back.</b> The overall score goes to the gradebook through LTI Assignment and Grade Services, or as the xAPI statement on this page to your LRS. The rubric scores travel with it, so trainers can see which skill is weak.</p>
+        <p><b>Checks before anything is saved.</b> Every rubric item must be scored once, scores must be 1 to 5, and every quote must really appear in the learner's lines. If the scoring reply fails these checks, the session goes to a human instead of the gradebook.</p>
+      </div>
+    </div>
+  </div>
+  <footer>Built by Alibek Kozhatayev · <a href="../">more demos</a> · logic and tests: coach.js, coach.test.mjs</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="module">
+import { SCENARIOS, validateScenario, actorSystemPrompt, judgeSystemPrompt, judgeSchema, transcriptText, parseJudge, toXapi } from "./coach.js";
+import { SAMPLE } from "./sample.js";
+
+const $ = id => document.getElementById(id);
+const scenarios = SCENARIOS.map(s => JSON.parse(JSON.stringify(s)));
+let current = scenarios[0];
+let turns = [];
+let apiMessages = [];
+let result = null;
+let mode = "sample";
+let startedAt = null, endedAt = null;
+let learner = { name: "Sample learner", email: "learner@example.com" };
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function fillScenarioSelect() {
+  $("scenario").innerHTML = scenarios.map(s => `<option value="${esc(s.id)}">${esc(s.title)}</option>`).join("");
+  $("scenario").value = current.id;
+}
+
+function showBrief() {
+  const p = current.persona;
+  $("brief").innerHTML = `<b>You are:</b> ${esc(current.learnerRole)}. <b>Talking to:</b> ${esc(p.name)}, ${esc(p.role)}. <b>Goal:</b> ${esc(current.goal)}`;
+  $("cfg").value = JSON.stringify(current, null, 2);
+  $("cfgMsg").innerHTML = "";
+}
+
+function renderChat() {
+  $("chat").innerHTML = turns.map(t => {
+    if (t.role === "system") return `<div class="msg system">${esc(t.text)}</div>`;
+    const who = t.role === "learner" ? "Learner" : current.persona.name;
+    return `<div class="msg ${t.role}"><span class="who">${esc(who)}</span>${esc(t.text)}</div>`;
+  }).join("");
+  $("chat").scrollTop = $("chat").scrollHeight;
+}
+
+function setMode(m) {
+  mode = m;
+  $("modePill").textContent = m === "sample" ? "Sample session" : "Live role play";
+  $("modePill").className = "pill " + (m === "sample" ? "sample" : "pass");
+  const live = m === "live";
+  $("msg").disabled = !live; $("send").disabled = !live; $("endScore").disabled = !live;
+  $("msg").placeholder = live ? `Reply to ${current.persona.name}...` : "Start a live role play to type here";
+}
+
+function renderScore() {
+  if (!result) {
+    $("score").innerHTML = `<p class="muted">Load the sample session or finish a live call to see the score.</p>`;
+    $("pdf").disabled = true; $("xapiBtn").disabled = true; $("xapi").hidden = true; $("scoreSub").textContent = "";
+    return;
+  }
+  const pass = result.score >= (current.passMark ?? 70);
+  const rows = result.criteria.map(c => `
+    <div class="row">
+      <div class="row-head"><b>${esc(c.name)}</b><span class="dots">${"●".repeat(c.score)}${"○".repeat(5 - c.score)} ${c.score}/5</span></div>
+      ${c.evidence ? `<p class="quote ${c.quoteFound ? "ok" : "bad"}">${esc(c.evidence)}</p>` : `<p class="tip">No line in the call shows this.</p>`}
+      <p class="tip">${esc(c.tip)}</p>
+    </div>`).join("");
+  $("score").innerHTML = `
+    <div class="score-head"><div class="big">${result.score}</div>
+      <div><span class="pill ${pass ? "pass" : "fail"}">${pass ? "Pass" : "Needs practice"} · pass mark ${current.passMark ?? 70}</span>
+      <div class="muted" style="margin-top:4px">${esc(result.summary)}</div></div></div>
+    ${result.warnings.map(w => `<div class="note">${esc(w)}</div>`).join("")}
+    ${rows}
+    <div class="row"><b>What went well</b><ul class="tight">${result.strengths.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+    <div class="row"><b>Practice next</b><ul class="tight">${result.nextPractice.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+  $("scoreSub").textContent = mode === "sample" ? "sample data" : "scored live";
+  $("pdf").disabled = false; $("xapiBtn").disabled = false;
+  $("xapi").textContent = JSON.stringify(xapiStatement(), null, 2);
+}
+
+function xapiStatement() {
+  return toXapi({ learnerName: learner.name, learnerEmail: learner.email, scenario: current, result, startedAt, endedAt });
+}
+
+function loadSample() {
+  current = scenarios.find(s => s.id === SAMPLE.scenarioId) || scenarios[0];
+  fillScenarioSelect(); showBrief();
+  turns = SAMPLE.turns.slice();
+  startedAt = SAMPLE.startedAt; endedAt = SAMPLE.endedAt;
+  learner = { name: SAMPLE.learnerName, email: SAMPLE.learnerEmail };
+  const parsed = parseJudge(SAMPLE.judge, current, turns);
+  result = parsed.ok ? parsed : null;
+  setMode("sample"); renderChat(); renderScore();
+  $("chatSub").textContent = "sample data, written for the demo";
+  $("chatError").innerHTML = "";
+}
+
+let client = null;
+async function getClient() {
+  const key = $("apiKey").value.trim();
+  if (!key) throw new Error("Add your Anthropic API key in Live mode first.");
+  try { sessionStorage.setItem("rpc_key", key); } catch (e) { /* storage blocked, keep going */ }
+  const { default: Anthropic } = await import("https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.1.0/+esm");
+  client = new Anthropic({ apiKey: key, dangerouslyAllowBrowser: true });
+  return client;
+}
+
+// Opus 5.5 and Sonnet 5.5 get the server-side refusal fallback; Haiku 5.5 has none.
+async function callClaude(params) {
+  const model = $("model").value;
+  const withFallback = model !== "claude-haiku-5-5";
+  const req = { model, ...params };
+  const res = withFallback
+    ? await client.beta.messages.create({ ...req, betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" })
+    : await client.messages.create(req);
+  if (res.stop_reason === "refusal") throw new Error("The model declined this request. Try rewording the scenario.");
+  return res;
+}
+
+const textOf = res => res.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+
+async function startLive() {
+  $("chatError").innerHTML = "";
+  try { await getClient(); } catch (e) { $("chatError").innerHTML = `<div class="alert">${esc(e.message)}</div>`; return; }
+  const p = current.persona;
+  turns = [{ role: "system", text: "Live role play started. Reply as the learner." }, { role: "persona", text: p.opening }];
+  apiMessages = [{ role: "user", content: "[The call starts. Open the conversation in character.]" }, { role: "assistant", content: [{ type: "text", text: p.opening }] }];
+  startedAt = new Date().toISOString(); endedAt = null; result = null;
+  learner = { name: "Live learner", email: "learner@example.com" };
+  setMode("live"); renderChat(); renderScore();
+  $("chatSub").textContent = "live, " + $("model").value;
+  $("msg").focus();
+}
+
+async function send() {
+  const text = $("msg").value.trim();
+  if (!text || mode !== "live") return;
+  $("msg").value = ""; $("send").disabled = true; $("chatError").innerHTML = "";
+  turns.push({ role: "learner", text }); renderChat();
+  apiMessages.push({ role: "user", content: text });
+  try {
+    const res = await callClaude({ max_tokens: 2000, system: actorSystemPrompt(current), messages: apiMessages, output_config: { effort: "low" } });
+    apiMessages.push({ role: "assistant", content: res.content });
+    turns.push({ role: "persona", text: textOf(res) || "..." }); renderChat();
+  } catch (e) {
+    apiMessages.pop(); turns.pop(); renderChat();
+    $("msg").value = text;
+    $("chatError").innerHTML = `<div class="alert">${esc(e.message || String(e))}</div>`;
+  } finally { $("send").disabled = false; $("msg").focus(); }
+}
+
+async function endAndScore() {
+  if (!turns.some(t => t.role === "learner")) { $("chatError").innerHTML = `<div class="alert">Say something first, then score the call.</div>`; return; }
+  endedAt = new Date().toISOString();
+  setMode("scoring");
+  $("modePill").textContent = "Scoring..."; $("modePill").className = "pill";
+  $("chatError").innerHTML = "";
+  const callTurns = turns.filter(t => t.role !== "system");
+  try {
+    const res = await callClaude({
+      max_tokens: 6000,
+      system: judgeSystemPrompt(current),
+      messages: [{ role: "user", content: "Transcript:\n" + transcriptText(callTurns, current) }],
+      output_config: { effort: "medium", format: { type: "json_schema", schema: judgeSchema(current) } }
+    });
+    const parsed = parseJudge(textOf(res), current, callTurns);
+    if (!parsed.ok) throw new Error(parsed.error);
+    result = parsed;
+    mode = "live"; renderScore();
+    $("modePill").textContent = "Scored"; $("modePill").className = "pill pass";
+  } catch (e) {
+    mode = "live"; $("endScore").disabled = false;
+    $("chatError").innerHTML = `<div class="alert">${esc(e.message || String(e))}</div>`;
+    $("modePill").textContent = "Needs human review"; $("modePill").className = "pill fail";
+  }
+}
+
+function loadJsPdf() {
+  if (window.jspdf) return Promise.resolve();
+  return new Promise((ok, fail) => {
+    const sc = document.createElement("script");
+    sc.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    sc.onload = ok; sc.onerror = () => fail(new Error("Could not load the PDF library. Check the connection and try again."));
+    document.head.appendChild(sc);
+  });
+}
+
+async function downloadPdf() {
+  if (!result) return;
+  try { await loadJsPdf(); } catch (e) { $("chatError").innerHTML = `<div class="alert">${esc(e.message)}</div>`; return; }
+  const doc = new window.jspdf.jsPDF({ unit: "pt", format: "a4" });
+  const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight(), M = 48;
+  let y = M;
+  const line = (txt, size = 11, style = "normal", gap = 4, color = [27, 35, 48]) => {
+    doc.setFont("helvetica", style); doc.setFontSize(size); doc.setTextColor(...color);
+    for (const part of doc.splitTextToSize(String(txt), W - 2 * M)) {
+      if (y > H - M) { doc.addPage(); y = M; }
+      doc.text(part, M, y); y += size + gap;
+    }
+  };
+  const pass = result.score >= (current.passMark ?? 70);
+  line("Coaching guide", 20, "bold", 8);
+  line(`${current.title} · ${learner.name} · ${new Date(endedAt || Date.now()).toLocaleDateString("en-GB")}`, 10, "normal", 10, [93, 103, 118]);
+  line(`Overall score: ${result.score}/100 (${pass ? "pass" : "needs practice"}, pass mark ${current.passMark ?? 70})`, 13, "bold", 6);
+  line(result.summary, 11, "normal", 12);
+  for (const c of result.criteria) {
+    line(`${c.name}: ${c.score}/5`, 12, "bold", 4);
+    line(c.evidence ? `You said: "${c.evidence}"` : "No line in the call shows this.", 10, "italic", 3, [70, 78, 90]);
+    line(`Tip: ${c.tip}`, 10.5, "normal", 10);
+  }
+  line("What went well", 12, "bold", 4);
+  result.strengths.forEach(x => line("- " + x, 10.5));
+  y += 6; line("Practice next", 12, "bold", 4);
+  result.nextPractice.forEach(x => line("- " + x, 10.5));
+  y += 10; line("Transcript", 12, "bold", 6);
+  turns.filter(t => t.role !== "system").forEach(t => line(`${t.role === "learner" ? "You" : current.persona.name}: ${t.text}`, 9.5, "normal", 3, [60, 66, 76]));
+  y += 8; line(mode === "sample" ? "Demo document with sample data." : "Generated by the Role Play Coach demo.", 8, "normal", 2, [130, 136, 146]);
+  doc.save(`coaching-guide-${current.id}.pdf`);
+}
+
+$("scenario").addEventListener("change", e => {
+  current = scenarios.find(s => s.id === e.target.value);
+  showBrief(); turns = [{ role: "system", text: "Press \"Start live role play\" to talk to " + current.persona.name + "." }];
+  result = null; setMode("sample"); renderChat(); renderScore();
+  $("modePill").textContent = "Ready"; $("chatSub").textContent = "";
+});
+$("loadSample").addEventListener("click", loadSample);
+$("startLive").addEventListener("click", startLive);
+$("send").addEventListener("click", send);
+$("msg").addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+$("endScore").addEventListener("click", endAndScore);
+$("pdf").addEventListener("click", downloadPdf);
+$("xapiBtn").addEventListener("click", () => { $("xapi").hidden = !$("xapi").hidden; });
+$("applyCfg").addEventListener("click", () => {
+  let next;
+  try { next = JSON.parse($("cfg").value); } catch (e) { $("cfgMsg").innerHTML = `<div class="alert">Not valid JSON: ${esc(e.message)}</div>`; return; }
+  const errs = validateScenario(next);
+  if (errs.length) { $("cfgMsg").innerHTML = `<div class="alert">${errs.map(esc).join("<br>")}</div>`; return; }
+  const i = scenarios.findIndex(s => s.id === current.id);
+  scenarios[i] = next; current = next;
+  fillScenarioSelect(); showBrief();
+  $("cfgMsg").innerHTML = `<div class="note">Applied. The next live role play and score use this config.</div>`;
+});
+$("resetCfg").addEventListener("click", () => {
+  const orig = SCENARIOS.find(s => s.id === current.id) || SCENARIOS[0];
+  const i = scenarios.findIndex(s => s.id === current.id);
+  scenarios[i] = JSON.parse(JSON.stringify(orig)); current = scenarios[i];
+  fillScenarioSelect(); showBrief();
+});
+try { const k = sessionStorage.getItem("rpc_key"); if (k) $("apiKey").value = k; } catch (e) { /* storage blocked */ }
+
+fillScenarioSelect();
+loadSample();
+</script>
+</body>
+</html>

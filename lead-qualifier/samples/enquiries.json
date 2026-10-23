@@ -1,0 +1,838 @@
+[
+ {
+  "source": "form",
+  "text": "Hi, I'm Laura Bennett from Northwind Logistics. We need corporate catering for 120 people on 2026-11-12, budget around $6,500. Please call me at +1 206 555 0141 or email laura.bennett@northwind.example.",
+  "label": {
+   "name": {
+    "value": "Laura Bennett",
+    "evidence": "I'm Laura Bennett"
+   },
+   "email": {
+    "value": "laura.bennett@northwind.example",
+    "evidence": "laura.bennett@northwind.example"
+   },
+   "phone": {
+    "value": "+1 206 555 0141",
+    "evidence": "+1 206 555 0141"
+   },
+   "company": {
+    "value": "Northwind Logistics",
+    "evidence": "Northwind Logistics"
+   },
+   "service_type": {
+    "value": "corporate_catering",
+    "evidence": "corporate catering"
+   },
+   "guests": {
+    "value": 120,
+    "evidence": "120 people"
+   },
+   "budget_usd": {
+    "value": 6500,
+    "evidence": "$6,500"
+   },
+   "event_date": {
+    "value": "2026-11-12",
+    "evidence": "2026-11-12"
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Corporate catering for 120 on 12 Nov, about $6.5k.",
+   "confidence": 0.95
+  },
+  "id": 1
+ },
+ {
+  "source": "form",
+  "text": "Wedding on 2027-06-19, about 80 guests, budget is flexible. Mia Torres, mia.t@mail.example",
+  "label": {
+   "name": {
+    "value": "Mia Torres",
+    "evidence": "Mia Torres"
+   },
+   "email": {
+    "value": "mia.t@mail.example",
+    "evidence": "mia.t@mail.example"
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": null,
+    "evidence": ""
+   },
+   "service_type": {
+    "value": "wedding",
+    "evidence": "Wedding"
+   },
+   "guests": {
+    "value": 80,
+    "evidence": "80 guests"
+   },
+   "budget_usd": {
+    "value": null,
+    "evidence": ""
+   },
+   "event_date": {
+    "value": "2027-06-19",
+    "evidence": "2027-06-19"
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Wedding for 80 in June 2027, budget not given.",
+   "confidence": 0.9
+  },
+  "id": 2
+ },
+ {
+  "source": "email",
+  "from_email": "ops@greenleafcafe.example",
+  "message_id": "<a1@greenleafcafe.example>",
+  "text": "Hello, Greenleaf Cafe here. We want to buy your pastries wholesale, roughly $2,400 a month, starting next spring. Thanks, Omar",
+  "label": {
+   "name": {
+    "value": "Omar",
+    "evidence": "Omar"
+   },
+   "email": {
+    "value": null,
+    "evidence": ""
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": "Greenleaf Cafe",
+    "evidence": "Greenleaf Cafe"
+   },
+   "service_type": {
+    "value": "wholesale",
+    "evidence": "wholesale"
+   },
+   "guests": {
+    "value": null,
+    "evidence": ""
+   },
+   "budget_usd": {
+    "value": 2400,
+    "evidence": "$2,400"
+   },
+   "event_date": {
+    "value": null,
+    "evidence": ""
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Cafe wants monthly wholesale pastries, about $2.4k.",
+   "confidence": 0.85
+  },
+  "id": 3
+ },
+ {
+  "source": "form",
+  "text": "URGENT: our caterer cancelled. Private event for 40 people this Saturday 2026-10-31, budget $1,800. Dan Kim 206-555-0177 dan.kim@mail.example",
+  "label": {
+   "name": {
+    "value": "Dan Kim",
+    "evidence": "Dan Kim"
+   },
+   "email": {
+    "value": "dan.kim@mail.example",
+    "evidence": "dan.kim@mail.example"
+   },
+   "phone": {
+    "value": "206-555-0177",
+    "evidence": "206-555-0177"
+   },
+   "company": {
+    "value": null,
+    "evidence": ""
+   },
+   "service_type": {
+    "value": "private_event",
+    "evidence": "Private event"
+   },
+   "guests": {
+    "value": 40,
+    "evidence": "40 people"
+   },
+   "budget_usd": {
+    "value": 1800,
+    "evidence": "$1,800"
+   },
+   "event_date": {
+    "value": "2026-10-31",
+    "evidence": "2026-10-31"
+   },
+   "urgency": {
+    "value": "high",
+    "evidence": "URGENT"
+   },
+   "summary": "Urgent private event for 40 on 31 Oct, $1.8k.",
+   "confidence": 0.95
+  },
+  "id": 4
+ },
+ {
+  "source": "form",
+  "text": "Do you do vegan menus? Just asking for now. - Sam, sam.r@mail.example",
+  "label": {
+   "name": {
+    "value": "Sam",
+    "evidence": "Sam"
+   },
+   "email": {
+    "value": "sam.r@mail.example",
+    "evidence": "sam.r@mail.example"
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": null,
+    "evidence": ""
+   },
+   "service_type": {
+    "value": "other",
+    "evidence": "vegan menus"
+   },
+   "guests": {
+    "value": null,
+    "evidence": ""
+   },
+   "budget_usd": {
+    "value": null,
+    "evidence": ""
+   },
+   "event_date": {
+    "value": null,
+    "evidence": ""
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "General question about vegan menus.",
+   "confidence": 0.8
+  },
+  "id": 5
+ },
+ {
+  "source": "email",
+  "from_email": "hr@contoso.example",
+  "message_id": "<b7@contoso.example>",
+  "text": "Hi team, Contoso is planning a holiday party for 200 staff on 2026-12-11. Budget $12,000. Who can we talk to? Priya Shah, HR",
+  "label": {
+   "name": {
+    "value": "Priya Shah",
+    "evidence": "Priya Shah"
+   },
+   "email": {
+    "value": null,
+    "evidence": ""
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": "Contoso",
+    "evidence": "Contoso"
+   },
+   "service_type": {
+    "value": "corporate_catering",
+    "evidence": "holiday party for 200 staff"
+   },
+   "guests": {
+    "value": 200,
+    "evidence": "200 staff"
+   },
+   "budget_usd": {
+    "value": 12000,
+    "evidence": "$12,000"
+   },
+   "event_date": {
+    "value": "2026-12-11",
+    "evidence": "2026-12-11"
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Holiday party for 200 on 11 Dec, $12k.",
+   "confidence": 0.92
+  },
+  "id": 6
+ },
+ {
+  "source": "form",
+  "text": "Birthday dinner for my mother, maybe 25 people in March. Can you send prices? Ana, ana.lopez@mail.example",
+  "label": {
+   "name": {
+    "value": "Ana",
+    "evidence": "Ana"
+   },
+   "email": {
+    "value": "ana.lopez@mail.example",
+    "evidence": "ana.lopez@mail.example"
+   },
+   "phone": {
+    "value": "+1 206 555 0199",
+    "evidence": "phone"
+   },
+   "company": {
+    "value": null,
+    "evidence": ""
+   },
+   "service_type": {
+    "value": "private_event",
+    "evidence": "Birthday dinner"
+   },
+   "guests": {
+    "value": 25,
+    "evidence": "25 people"
+   },
+   "budget_usd": {
+    "value": null,
+    "evidence": ""
+   },
+   "event_date": {
+    "value": null,
+    "evidence": ""
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Birthday dinner for about 25 in March.",
+   "confidence": 0.7
+  },
+  "id": 7
+ },
+ {
+  "source": "form",
+  "text": "Need lunch boxes for a training day, 35 people, 2026-11-04. Around $700. Ben Lowe, Lowe Consulting, ben@loweconsulting.example",
+  "label": {
+   "name": {
+    "value": "Ben Lowe",
+    "evidence": "Ben Lowe"
+   },
+   "email": {
+    "value": "ben@loweconsulting.example",
+    "evidence": "ben@loweconsulting.example"
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": "Lowe Consulting",
+    "evidence": "Lowe Consulting"
+   },
+   "service_type": {
+    "value": "corporate_catering",
+    "evidence": "lunch boxes for a training day"
+   },
+   "guests": {
+    "value": 35,
+    "evidence": "35 people"
+   },
+   "budget_usd": {
+    "value": 700,
+    "evidence": "$700"
+   },
+   "event_date": {
+    "value": "2026-11-04",
+    "evidence": "2026-11-04"
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Lunch boxes for 35 on 4 Nov, $700.",
+   "confidence": 0.93
+  },
+  "id": 8
+ },
+ {
+  "source": "form",
+  "text": "hi can u cater",
+  "label": {
+   "name": {
+    "value": null,
+    "evidence": ""
+   },
+   "email": {
+    "value": null,
+    "evidence": ""
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": null,
+    "evidence": ""
+   },
+   "service_type": {
+    "value": "other",
+    "evidence": "cater"
+   },
+   "guests": {
+    "value": null,
+    "evidence": ""
+   },
+   "budget_usd": {
+    "value": null,
+    "evidence": ""
+   },
+   "event_date": {
+    "value": null,
+    "evidence": ""
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "One-line message, no details.",
+   "confidence": 0.3
+  },
+  "id": 9
+ },
+ {
+  "source": "email",
+  "from_email": "events@harborhotel.example",
+  "message_id": "<c3@harborhotel.example>",
+  "text": "Harbor Hotel would like a quote for a conference dinner, 150 guests, 2027-02-20, budget up to $9,000. Regards, Jonas Berg, Events Manager, +1 425 555 0102",
+  "label": {
+   "name": {
+    "value": "Jonas Berg",
+    "evidence": "Jonas Berg"
+   },
+   "email": {
+    "value": null,
+    "evidence": ""
+   },
+   "phone": {
+    "value": "+1 425 555 0102",
+    "evidence": "+1 425 555 0102"
+   },
+   "company": {
+    "value": "Harbor Hotel",
+    "evidence": "Harbor Hotel"
+   },
+   "service_type": {
+    "value": "corporate_catering",
+    "evidence": "conference dinner"
+   },
+   "guests": {
+    "value": 150,
+    "evidence": "150 guests"
+   },
+   "budget_usd": {
+    "value": 9000,
+    "evidence": "$9,000"
+   },
+   "event_date": {
+    "value": "2027-02-20",
+    "evidence": "2027-02-20"
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Conference dinner for 150 on 20 Feb, up to $9k.",
+   "confidence": 0.94
+  },
+  "id": 10
+ },
+ {
+  "source": "form",
+  "text": "Small engagement party at home, 15 people on 2026-12-05, $600. Lena 206 555 0123",
+  "label": {
+   "name": {
+    "value": "Lena",
+    "evidence": "Lena"
+   },
+   "email": {
+    "value": null,
+    "evidence": ""
+   },
+   "phone": {
+    "value": "206 555 0123",
+    "evidence": "206 555 0123"
+   },
+   "company": {
+    "value": null,
+    "evidence": ""
+   },
+   "service_type": {
+    "value": "private_event",
+    "evidence": "engagement party"
+   },
+   "guests": {
+    "value": 15,
+    "evidence": "15 people"
+   },
+   "budget_usd": {
+    "value": 600,
+    "evidence": "$600"
+   },
+   "event_date": {
+    "value": "2026-12-05",
+    "evidence": "2026-12-05"
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Engagement party for 15 on 5 Dec, $600.",
+   "confidence": 0.9
+  },
+  "id": 11
+ },
+ {
+  "source": "form",
+  "text": "We are a startup, Acme Robotics, team offsite next month for 30. Budget not decided. Contact: tom@acmerobotics.example",
+  "label": {
+   "name": {
+    "value": "Tom",
+    "evidence": "tom@"
+   },
+   "email": {
+    "value": "tom@acmerobotics.example",
+    "evidence": "tom@acmerobotics.example"
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": "Acme Robotics",
+    "evidence": "Acme Robotics"
+   },
+   "service_type": {
+    "value": "corporate_catering",
+    "evidence": "team offsite"
+   },
+   "guests": {
+    "value": 30,
+    "evidence": "30"
+   },
+   "budget_usd": {
+    "value": 3000,
+    "evidence": "budget"
+   },
+   "event_date": {
+    "value": null,
+    "evidence": ""
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Startup offsite for 30 next month, budget open.",
+   "confidence": 0.75
+  },
+  "id": 12
+ },
+ {
+  "source": "form",
+  "text": "Wedding 2026-11-28, 60 guests, $5,500. It's very urgent, our venue's caterer dropped out. Grace Park, grace.park@mail.example, 206-555-0168",
+  "label": {
+   "name": {
+    "value": "Grace Park",
+    "evidence": "Grace Park"
+   },
+   "email": {
+    "value": "grace.park@mail.example",
+    "evidence": "grace.park@mail.example"
+   },
+   "phone": {
+    "value": "206-555-0168",
+    "evidence": "206-555-0168"
+   },
+   "company": {
+    "value": null,
+    "evidence": ""
+   },
+   "service_type": {
+    "value": "wedding",
+    "evidence": "Wedding"
+   },
+   "guests": {
+    "value": 60,
+    "evidence": "60 guests"
+   },
+   "budget_usd": {
+    "value": 5500,
+    "evidence": "$5,500"
+   },
+   "event_date": {
+    "value": "2026-11-28",
+    "evidence": "2026-11-28"
+   },
+   "urgency": {
+    "value": "high",
+    "evidence": "very urgent"
+   },
+   "summary": "Urgent wedding for 60 on 28 Nov, $5.5k.",
+   "confidence": 0.96
+  },
+  "id": 13
+ },
+ {
+  "source": "email",
+  "from_email": "buyer@freshmart.example",
+  "message_id": "<d9@freshmart.example>",
+  "text": "FreshMart grocery chain is looking for a wholesale supplier of ready meals, about $15,000 per month, start 2027-01-15. Please send your catalogue. Kevin Ito",
+  "label": {
+   "name": {
+    "value": "Kevin Ito",
+    "evidence": "Kevin Ito"
+   },
+   "email": {
+    "value": null,
+    "evidence": ""
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": "FreshMart",
+    "evidence": "FreshMart"
+   },
+   "service_type": {
+    "value": "wholesale",
+    "evidence": "wholesale supplier of ready meals"
+   },
+   "guests": {
+    "value": null,
+    "evidence": ""
+   },
+   "budget_usd": {
+    "value": 15000,
+    "evidence": "$15,000"
+   },
+   "event_date": {
+    "value": "2027-01-15",
+    "evidence": "2027-01-15"
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Grocery chain wants wholesale ready meals, $15k a month from mid-Jan.",
+   "confidence": 0.9
+  },
+  "id": 14
+ },
+ {
+  "source": "form",
+  "text": "Hi, I'm Laura Bennett from Northwind Logistics. We need corporate catering for 120 people on 2026-11-12, budget around $6,500. Please call me at +1 206 555 0141 or email laura.bennett@northwind.example.",
+  "note": "exact double submit of enquiry 1",
+  "label": null,
+  "id": 15
+ },
+ {
+  "source": "form",
+  "text": "Memorial reception for 50, 2026-11-08, around $2,000. Please reply by tomorrow. Ruth Adler ruth.adler@mail.example",
+  "label": {
+   "name": {
+    "value": "Ruth Adler",
+    "evidence": "Ruth Adler"
+   },
+   "email": {
+    "value": "ruth.adler@mail.example",
+    "evidence": "ruth.adler@mail.example"
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": null,
+    "evidence": ""
+   },
+   "service_type": {
+    "value": "private_event",
+    "evidence": "Memorial reception"
+   },
+   "guests": {
+    "value": 50,
+    "evidence": "50"
+   },
+   "budget_usd": {
+    "value": 2000,
+    "evidence": "$2,000"
+   },
+   "event_date": {
+    "value": "2026-11-08",
+    "evidence": "2026-11-08"
+   },
+   "urgency": {
+    "value": "high",
+    "evidence": "reply by tomorrow"
+   },
+   "summary": "Memorial reception for 50 on 8 Nov, about $2k, needs reply by tomorrow.",
+   "confidence": 0.9
+  },
+  "id": 16
+ },
+ {
+  "source": "form",
+  "text": "Are you hiring chefs? Sending my CV. Marco, marco.chef@mail.example",
+  "label": {
+   "name": {
+    "value": "Marco",
+    "evidence": "Marco"
+   },
+   "email": {
+    "value": "marco.chef@mail.example",
+    "evidence": "marco.chef@mail.example"
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": null,
+    "evidence": ""
+   },
+   "service_type": {
+    "value": "other",
+    "evidence": "hiring chefs"
+   },
+   "guests": {
+    "value": null,
+    "evidence": ""
+   },
+   "budget_usd": {
+    "value": null,
+    "evidence": ""
+   },
+   "event_date": {
+    "value": null,
+    "evidence": ""
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Job application, not a sales lead.",
+   "confidence": 0.9
+  },
+  "id": 17
+ },
+ {
+  "source": "form",
+  "text": "Company picnic for Blue Fin Software, 90 people, 2027-05-30, budget $4,000. Call Ella at +1 206 555 0110.",
+  "label": {
+   "name": {
+    "value": "Ella",
+    "evidence": "Ella"
+   },
+   "email": {
+    "value": null,
+    "evidence": ""
+   },
+   "phone": {
+    "value": "+1 206 555 0110",
+    "evidence": "+1 206 555 0110"
+   },
+   "company": {
+    "value": "Blue Fin Software",
+    "evidence": "Blue Fin Software"
+   },
+   "service_type": {
+    "value": "corporate_catering",
+    "evidence": "Company picnic"
+   },
+   "guests": {
+    "value": 90,
+    "evidence": "90 people"
+   },
+   "budget_usd": {
+    "value": 4000,
+    "evidence": "$4,000"
+   },
+   "event_date": {
+    "value": "2027-05-30",
+    "evidence": "2027-05-30"
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Company picnic for 90 on 30 May 2027, $4k.",
+   "confidence": 0.92
+  },
+  "id": 18
+ },
+ {
+  "source": "email",
+  "from_email": "j.morales@mail.example",
+  "message_id": "<e2@mail.example>",
+  "text": "Hi, looking for catering for a baby shower, 20 guests, 2026-11-21, budget about $900. Thanks! Julia Morales",
+  "label": {
+   "name": {
+    "value": "Julia Morales",
+    "evidence": "Julia Morales"
+   },
+   "email": {
+    "value": null,
+    "evidence": ""
+   },
+   "phone": {
+    "value": null,
+    "evidence": ""
+   },
+   "company": {
+    "value": null,
+    "evidence": ""
+   },
+   "service_type": {
+    "value": "private_event",
+    "evidence": "baby shower"
+   },
+   "guests": {
+    "value": 20,
+    "evidence": "20 guests"
+   },
+   "budget_usd": {
+    "value": 900,
+    "evidence": "$900"
+   },
+   "event_date": {
+    "value": "2026-11-21",
+    "evidence": "2026-11-21"
+   },
+   "urgency": {
+    "value": "normal",
+    "evidence": ""
+   },
+   "summary": "Baby shower for 20 on 21 Nov, about $900.",
+   "confidence": 0.92
+  },
+  "id": 19
+ },
+ {
+  "source": "email",
+  "from_email": "j.morales@mail.example",
+  "message_id": "<e2@mail.example>",
+  "text": "Hi, looking for catering for a baby shower, 20 guests, 2026-11-21, budget about $900. Thanks! Julia Morales",
+  "note": "same email delivered twice by the mail webhook (same Message-ID)",
+  "label": null,
+  "id": 20
+ }
+]

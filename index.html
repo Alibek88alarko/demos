@@ -29,6 +29,14 @@
   <p class="lead">Working demos of automations and small web tools. All of them run on sample data.</p>
   <div class="grid">
     <div class="card">
+      <h2>AI lead qualification: enquiry to CRM, once</h2>
+      <p>Python module for an existing FastAPI or Django backend. Claude extracts fields with evidence, a check removes anything not in the enquiry, rules in a YAML file decide Hot, Warm, Medium or Cold, the CRM upsert is idempotent with retries, unclear cases go to review. 20 sample enquiries and 11 tests.</p>
+      <div class="links">
+        <a class="live" href="https://github.com/Alibek88alarko/demos/tree/main/lead-qualifier">Open code</a>
+        <a href="https://github.com/Alibek88alarko/demos/blob/main/lead-qualifier/samples/results.md">Results on 20 enquiries</a>
+      </div>
+    </div>
+    <div class="card">
       <h2>Role Play Coach: AI customer, rubric score, PDF coaching guide</h2>
       <p>One agent for many training scenarios. The learner talks to an AI customer, a second pass scores the call against the scenario rubric and quotes the exact lines, quotes are checked against the transcript, then a PDF coaching guide and an xAPI statement for the LMS. Scenarios are JSON configs you can edit on the page.</p>
       <div class="links">

@@ -1,0 +1,30 @@
+# Lead scoring rules. Edit this file, not the code. The AI only extracts fields;
+# these rules decide the tag.
+budget_usd:          # points by budget band
+  - {min: 5000, points: 40}
+  - {min: 2000, points: 25}
+  - {min: 1, points: 10}
+timeline_days:       # points by days until the event or start date
+  - {max: 30, points: 25}
+  - {max: 90, points: 15}
+  - {max: 100000, points: 5}
+service_type:        # points by service
+  corporate_catering: 20
+  private_event: 20
+  wedding: 20
+  wholesale: 10
+  other: 0
+urgency:
+  high: 10
+  normal: 0
+  low: 0
+has_company: 10
+has_phone: 5
+tags:                # first match wins, highest first
+  - {name: Hot, min: 70}
+  - {name: Warm, min: 50}
+  - {name: Medium, min: 30}
+  - {name: Cold, min: 0}
+needs_review:
+  min_confidence: 0.6       # below this the lead is flagged
+  require_contact: true     # flag if neither email nor phone survived the checks

@@ -29,6 +29,13 @@
   <p class="lead">Working demos of automations and small web tools. All of them run on sample data.</p>
   <div class="grid">
     <div class="card">
+      <h2>RFID goods receiving: de-duplicated reads, explicit stock states</h2>
+      <p>RC522 reader on an Arduino reports tag UIDs, a Python host turns reads into stock movements that follow fixed states (issued, received, consumed). Duplicate reads inside a 2 s window are ignored, unknown and wrong-state tags are flagged instead of guessed, an inventory count reconciles actual versus expected. State on disk, every event logged. 6 tests, runs without hardware in simulation mode.</p>
+      <div class="links">
+        <a class="live" href="https://github.com/Alibek88alarko/demos/tree/main/rfid-receiving">Open code</a>
+      </div>
+    </div>
+    <div class="card">
       <h2>AI lead qualification: enquiry to CRM, once</h2>
       <p>Python module for an existing FastAPI or Django backend. Claude extracts fields with evidence, a check removes anything not in the enquiry, rules in a YAML file decide Hot, Warm, Medium or Cold, the CRM upsert is idempotent with retries, unclear cases go to review. 20 sample enquiries and 11 tests.</p>
       <div class="links">
